@@ -43,17 +43,22 @@ public class ChatServer {
         private Socket socket;
         private PrintWriter out;
         private String nickname;
+        private String clientIP;
 
         public ClientHandler(Socket socket) {
             this.socket = socket;
+            // 클라이언트 IP 주소 가져오기
+            InetAddress inetAddress = socket.getInetAddress();
+            this.clientIP = inetAddress.getHostAddress();
         }
 
         @Override
         public void run() {
             try (BufferedReader in = new BufferedReader(
-                     new InputStreamReader(socket.getInputStream()))) {
+                     new InputStreamReader(socket.getInputStream(), "UTF-8"))) {
 
-                out = new PrintWriter(socket.getOutputStream(), true);
+                out = new PrintWriter(new OutputStreamWriter(
+                    socket.getOutputStream(), "UTF-8"), true);
 
                 // 닉네임 설정
                 out.println("닉네임을 입력하세요:");
@@ -63,23 +68,23 @@ public class ChatServer {
                     return;
                 }
 
-                System.out.println(nickname + "님이 채팅방에 입장했습니다.");
-                broadcast(nickname + "님이 채팅방에 입장했습니다.", this);
+                System.out.println(nickname + "[" + clientIP + "]님이 채팅방에 입장했습니다.");
+                broadcast(nickname + "[" + clientIP + "]님이 채팅방에 입장했습니다.", this);
 
                 String message;
                 while ((message = in.readLine()) != null) {
                     if ("bye".equalsIgnoreCase(message)) {
                         break;
                     }
-                    broadcast(nickname + ": " + message, this);
+                    broadcast(nickname + "[" + clientIP + "]: " + message, this);
                 }
 
             } catch (IOException e) {
                 System.err.println("클라이언트 처리 오류: " + e.getMessage());
             } finally {
                 if (nickname != null) {
-                    System.out.println(nickname + "님이 채팅방을 나갔습니다.");
-                    broadcast(nickname + "님이 채팅방을 나갔습니다.", this);
+                    System.out.println(nickname + "[" + clientIP + "]님이 채팅방을 나갔습니다.");
+                    broadcast(nickname + "[" + clientIP + "]님이 채팅방을 나갔습니다.", this);
                 }
                 clients.remove(this);
                 try {

@@ -50,9 +50,9 @@ public class MultiThreadEchoServer {
         @Override
         public void run() {
             try (BufferedReader in = new BufferedReader(
-                     new InputStreamReader(clientSocket.getInputStream()));
+                     new InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
                  PrintWriter out = new PrintWriter(
-                     clientSocket.getOutputStream(), true)) {
+                     new OutputStreamWriter(clientSocket.getOutputStream(), "UTF-8"), true)) {
 
                 String clientAddress = clientSocket.getRemoteSocketAddress().toString();
                 System.out.println("클라이언트 연결됨: " + clientAddress);
