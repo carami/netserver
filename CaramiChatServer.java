@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ChatServer {
+public class CaramiChatServer {
     private static final int PORT = 12345;
     private static Set<ClientHandler> clients = ConcurrentHashMap.newKeySet();
 
