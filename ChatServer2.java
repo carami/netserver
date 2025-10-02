@@ -5,12 +5,11 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.Collection; // Collection 사용을 명시적으로 import
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ChatServer2 {
-    
+
     // 닉네임을 키로 ClientHandler를 저장하는 스레드 안전한 맵
     private static ConcurrentHashMap<String, ClientHandler> clientsMap = new ConcurrentHashMap<>();
 
@@ -35,7 +34,7 @@ public class ChatServer2 {
 
     public static void main(String[] args) {
         int port = 0;
-        
+
         // 1. 실행 시 포트 번호 입력받기
         try (Scanner scanner = new Scanner(System.in)) {
             System.out.print("채팅 서버가 사용할 포트 번호를 입력하세요 (예: 12345): ");
@@ -103,7 +102,7 @@ public class ChatServer2 {
                 return false;
             }
         }
-        
+
         // 사용법 안내 메시지 출력 메서드
         private void sendHelpMessage() {
             this.sendMessage("==================== 채팅 사용법 ====================");
@@ -121,17 +120,22 @@ public class ChatServer2 {
                 out = new PrintWriter(socket.getOutputStream(), true);
 
                 // 닉네임 입력 요청 및 처리
-                out.println("닉네임을 입력하세요.");
-                String tempNickname = in.readLine();
+                String tempNickname = null;
 
-                if (tempNickname == null) {
-                    return;
-                }
+                while (tempNickname == null) {
+                    out.println("닉네임을 입력하세요.");
+                    String inputNickname = in.readLine();
 
-                // 닉네임 중복 처리
-                if (clientsMap.containsKey(tempNickname)) {
-                    out.println("[시스템] 이미 사용 중인 닉네임입니다. 연결을 종료합니다.");
-                    return;
+                    if (inputNickname == null) {
+                        return;
+                    }
+
+                    // 닉네임 중복 처리
+                    if (clientsMap.containsKey(inputNickname)) {
+                        out.println("[시스템] 이미 사용 중인 닉네임입니다. 다시 입력해주세요.");
+                    } else {
+                        tempNickname = inputNickname;
+                    }
                 }
 
                 this.nickname = tempNickname;
@@ -139,7 +143,7 @@ public class ChatServer2 {
 
                 // 서버 콘솔에 닉네임 + IP 표시
                 System.out.println(nickname + "(" + clientIp + ")님 입장. 현재 접속자 수: " + clientsMap.size());
-                
+
                 sendHelpMessage(); // 입장 시 사용법 안내
 
                 // 입장 메시지 브로드캐스트 (IP 포함)
