@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.Collection; // Collection 사용을 명시적으로 import
 import java.util.Scanner;
 
-public class ChatServer {
+public class ChatServer2 {
     
     // 닉네임을 키로 ClientHandler를 저장하는 스레드 안전한 맵
     private static ConcurrentHashMap<String, ClientHandler> clientsMap = new ConcurrentHashMap<>();
